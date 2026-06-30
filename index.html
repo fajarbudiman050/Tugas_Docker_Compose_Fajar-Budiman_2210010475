@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Saintifik Modern</title>
+    <style>
+        /* CSS Reset & Basic Setup */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            padding: 20px;
+        }
+
+        /* Desain Glassmorphism Container */
+        .calculator {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            border-radius: 24px;
+            padding: 25px;
+            width: 100%;
+            max-width: 420px; /* Diperlebar untuk mode saintifik */
+        }
+
+        /* Layar Kalkulator */
+        .display-container {
+            margin-bottom: 20px;
+        }
+
+        #display {
+            width: 100%;
+            height: 80px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            color: #ffffff;
+            font-size: 2.2em;
+            text-align: right;
+            padding: 15px;
+            outline: none;
+            box-shadow: inset 0 4px 6px rgba(0, 0, 0, 0.2);
+            letter-spacing: 1px;
+            overflow-x: auto;
+        }
+
+        #display::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Grid Tombol - 5 Kolom untuk Saintifik */
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+
+        button {
+            padding: 16px 0;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        /* Klasifikasi Warna Tombol */
+        .sci { background: rgba(0, 212, 255, 0.1); color: #00d4ff; }
+        .sci:hover { background: rgba(0, 212, 255, 0.25); }
+
+        .operator { background: rgba(255, 159, 67, 0.15); color: #ff9f43; font-weight: 600; font-size: 1.3em;}
+        .operator:hover { background: rgba(255, 159, 67, 0.35); }
+
+        .clear { background: rgba(238, 82, 83, 0.15); color: #ee5253; font-weight: 600; }
+        .clear:hover { background: rgba(238, 82, 83, 0.35); }
+
+        .equal { background: rgba(29, 209, 161, 0.25); color: #1dd1a1; font-weight: 600; font-size: 1.3em;}
+        .equal:hover { background: rgba(29, 209, 161, 0.45); }
+    </style>
+</head>
+<body>
+
+    <div class="calculator">
+        <div class="display-container">
+            <input type="text" id="display" placeholder="0" disabled>
+        </div>
+        <div class="buttons">
+            <button class="sci" onclick="appendToDisplay('sin(')">sin</button>
+            <button class="sci" onclick="appendToDisplay('cos(')">cos</button>
+            <button class="sci" onclick="appendToDisplay('tan(')">tan</button>
+            <button class="clear" onclick="clearDisplay()">AC</button>
+            <button class="clear" onclick="deleteLast()">DEL</button>
+            
+            <button class="sci" onclick="appendToDisplay('log(')">log</button>
+            <button class="sci" onclick="appendToDisplay('ln(')">ln</button>
+            <button class="sci" onclick="appendToDisplay('(')">(</button>
+            <button class="sci" onclick="appendToDisplay(')')">)</button>
+            <button class="operator" onclick="appendToDisplay('÷')">÷</button>
+            
+            <button class="sci" onclick="appendToDisplay('√(')">√</button>
+            <button onclick="appendToDisplay('7')">7</button>
+            <button onclick="appendToDisplay('8')">8</button>
+            <button onclick="appendToDisplay('9')">9</button>
+            <button class="operator" onclick="appendToDisplay('×')">×</button>
+            
+            <button class="sci" onclick="appendToDisplay('^')">x^y</button>
+            <button onclick="appendToDisplay('4')">4</button>
+            <button onclick="appendToDisplay('5')">5</button>
+            <button onclick="appendToDisplay('6')">6</button>
+            <button class="operator" onclick="appendToDisplay('-')">−</button>
+            
+            <button class="sci" onclick="appendToDisplay('π')">π</button>
+            <button onclick="appendToDisplay('1')">1</button>
+            <button onclick="appendToDisplay('2')">2</button>
+            <button onclick="appendToDisplay('3')">3</button>
+            <button class="operator" onclick="appendToDisplay('+')">+</button>
+            
+            <button class="sci" onclick="appendToDisplay('e')">e</button>
+            <button onclick="appendToDisplay('%')">%</button>
+            <button onclick="appendToDisplay('0')">0</button>
+            <button onclick="appendToDisplay('.')">.</button>
+            <button class="equal" onclick="calculate()">=</button>
+        </div>
+    </div>
+
+    <script>
+        const display = document.getElementById('display');
+
+        // Definisi Fungsi Matematika (Trigonometri dalam Derajat untuk kemudahan user)
+        const sin = (deg) => Math.sin(deg * (Math.PI / 180));
+        const cos = (deg) => Math.cos(deg * (Math.PI / 180));
+        const tan = (deg) => Math.tan(deg * (Math.PI / 180));
+        const log = (num) => Math.log10(num);
+        const ln = (num) => Math.log(num);
+        const sqrt = (num) => Math.sqrt(num);
+        const π = Math.PI;
+        const e = Math.E;
+
+        // Menambahkan input ke layar
+        function appendToDisplay(input) {
+            if(display.value === "Error" || display.value === "Infinity" || display.value === "NaN") {
+                display.value = "";
+            }
+            display.value += input;
+        }
+
+        function clearDisplay() { display.value = ''; }
+        function deleteLast() { display.value = display.value.toString().slice(0, -1); }
+
+        function calculate() {
+            try {
+                let expr = display.value;
+                
+                // Konversi simbol UI menjadi format Javascript
+                expr = expr.replace(/×/g, '*');
+                expr = expr.replace(/÷/g, '/');
+                expr = expr.replace(/\^/g, '**'); 
+                expr = expr.replace(/√/g, 'sqrt');
+                expr = expr.replace(/%/g, '/100');
+
+                // Evaluasi ekspresi (akan otomatis memanggil fungsi const sin, cos, dll di atas)
+                let result = eval(expr);
+                
+                if (result === undefined || isNaN(result) || !isFinite(result)) {
+                    throw new Error("Invalid");
+                }
+                
+                // Membulatkan hasil desimal agar tidak kepanjangan (maksimal 8 angka di belakang koma)
+                display.value = Number.isInteger(result) ? result : parseFloat(result.toFixed(8));
+                
+            } catch (error) {
+                display.value = "Error";
+                setTimeout(clearDisplay, 1500);
+            }
+        }
+    </script>
+</body>
+</html>

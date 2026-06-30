@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  app-kalkulator:
+    build: .
+    container_name: tugas-cloud-kalkulator
+    ports:
+      - "8080:80"
+    restart: always
